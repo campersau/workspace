@@ -1,0 +1,82 @@
+import java.util.Stack;
+
+public class TPalindrom {
+
+	public static boolean isTPalindrome(String text) 
+	{
+		String nana = text;
+		String k = text;
+		String x ="";
+		boolean erg = false;
+		while (nana.contains("("))
+		{
+			k = text.substring(nana.indexOf("(")+1, nana.lastIndexOf(")"));
+			x = text.substring(nana.indexOf("("), nana.lastIndexOf(")")+1);
+			if (isTPalindrome(k)){
+				nana.replace(x.toString(), "*");
+			}
+		}
+
+		if(isPalindrome(nana)){
+			erg = true;
+		}
+		
+
+		return erg;
+
+
+	}
+
+	public static boolean isPalindrome(String text) 
+	{
+		String b = text.toLowerCase();	// zeichen groß machen um groesen Probleme zu vermeiden
+		boolean erg = true;				// bool inizialisieren
+		Stack<Character> s = new Stack<Character>();	// Stack aufbauen
+		int array[] = new int[text.length()];			//array mit eingegebenem Text
+
+
+		int string_length = b.length();		//eigentlich unoetig aber trotzdem gemacht
+		int temp = 0;						//für das actuelle array
+
+		for(int i = 0; i < string_length; i++)	// ueberprueft auf zeichen und laest sonderzeichen aus
+		{
+			
+			if(b.charAt(i) > 64 && b.charAt(i) <= 90)	//wenn es ein buchstabe ist wirds auf den Stack gepusht
+			{
+				s.push(b.charAt(i));
+				array[temp] = b.charAt(i);
+
+				temp++;		//actueller arry zaeler wird hochgesetzt
+			}
+			else if (b.charAt(i)==42) {
+				s.push(b.charAt(i));
+				array[temp] = b.charAt(i);
+
+				temp++;
+			}
+		}
+
+
+
+		for(int i = 0; i < s.size(); i++) //erg wird berechnt ob es ein palindrom ist
+		{
+			if(array[i] != s.pop())
+			{
+				erg = false; 
+			}
+		}
+
+		return erg;
+	}
+
+
+
+
+
+
+	public static void main(String[] args) 
+	{
+		System.out.println(isTPalindrome("ma(ada)am"));
+
+	}
+}

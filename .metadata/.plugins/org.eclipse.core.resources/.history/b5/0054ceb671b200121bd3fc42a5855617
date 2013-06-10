@@ -1,0 +1,17 @@
+
+public class Variabeln {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		int i = 5;
+		int identifier ;
+		int h = 4 ;
+		int id1 , id2 [ 4 , 5 ];
+		System.out.println(id1);
+		System.out.println(id2);
+
+	}
+
+}

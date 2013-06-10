@@ -1,0 +1,78 @@
+import java.util.Stack;
+
+
+public class TPalindrom {
+
+	public static boolean isTPalindrome(String text) 
+	{
+		String k = text;
+		boolean erg = false;
+		if (text.contains("("))
+		{
+			k = text.substring(text.indexOf("(")+1, text.lastIndexOf(")")-1);
+			if (isTPalindrome(k)){
+				text.replace(k, "*");
+			}
+		}
+
+
+		isPalindrome(text);
+
+		return erg;
+
+
+	}
+
+	public static boolean isPalindrome(String text) 
+	{
+		String b = text.toLowerCase();	
+		boolean erg = true;				
+		Stack<Character> s = new Stack<Character>();	
+		int array[] = new int[text.length()];		
+
+
+		int string_length = b.length();		
+		int temp = 0;						
+
+		for(int i = 0; i < string_length; i++)
+		{
+			
+						if(b.charAt(i) > 64 && b.charAt(i) <= 90 )
+						{
+							s.push(b.charAt(i));
+							array[temp] = b.charAt(i);
+			
+							temp++;	
+						}
+						else if(b.charAt(i)==42){
+							s.push(b.charAt(i));
+							array[temp] = b.charAt(i);
+			
+							temp++;	
+						}
+		}
+
+
+
+		for(int i = 0; i < s.size(); i++)
+		{
+			if(array[i] != s.pop())
+			{
+				erg = false; 
+			}
+		}
+
+		return erg;
+	}
+
+
+
+
+
+
+	public static void main(String[] args) 
+	{
+		System.out.println(isTPalindrome("ma(ada)am"));
+
+	}
+}

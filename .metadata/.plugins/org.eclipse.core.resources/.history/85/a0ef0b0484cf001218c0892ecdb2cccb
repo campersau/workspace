@@ -1,0 +1,7 @@
+import java.util.LinkedList;
+public class astern {
+	
+	private LinkedList<Field> openlist = new LinkedList();
+	private LinkedList<Field> closedlist = new LinkedList();
+
+}

@@ -1,0 +1,62 @@
+import java.io.ObjectInputStream.GetField;
+
+import client.game.factory.PlayerControllerLoader.PlayerControllerType;
+import client.gui.match.PlayerInfoPanel;
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.map.FieldType;
+import core.player.Player;
+import core.player.Player.Action;
+import core.player.PlayerController;
+
+
+public class ersterVersuch extends PlayerController{
+
+	@Override
+	public String getName() {
+		return "kannnix";
+	}
+
+	@Override
+	public String getAuthor() {
+		return "Fabi";
+	}
+	public Position getFlag(AiMapInfo map){
+		Position erg = null;
+		for (int i = 0; i < map.getHeight(); i++){
+			for (int n = 0; n < map.getWidth(); n++){
+				if(map.getField(new Position(i,n)).equals(FieldType.ACTION_FIELD_FLAG))erg = erg.add(i, n);
+			}
+		}
+		return erg;
+	}
+
+
+	@Override
+	public Action think(AiMapInfo map, AiPlayerInfo[] enemies,
+			AiPlayerInfo ownPlayer) {
+
+		FieldType rightField = map.getField(ownPlayer.getPosition().right());
+		FieldType leftField = map.getField(ownPlayer.getPosition().left());
+		FieldType downField = map.getField(ownPlayer.getPosition().down());
+		FieldType upField = map.getField(ownPlayer.getPosition().up());
+		
+		int [][] lala = new int [map.getHeight()-1][map.getWidth()-1];
+		Map karte = new Map(lala);
+		
+		
+		
+		if( map.isParkourMap()){
+			if(rightField.equals(Field.fieldtoPosition(AStar.getNextField(karte ,ownPlayer.getPosition().x, ownPlayer.getPosition().y,getFlag(map).x, getFlag(map).y, ownPlayer))))return Player.Action.MOVE_RIGHT;
+			if(leftField.equals(Field.fieldtoPosition(AStar.getNextField(karte ,ownPlayer.getPosition().x, ownPlayer.getPosition().y,getFlag(map).x, getFlag(map).y, ownPlayer))))return Player.Action.MOVE_LEFT;
+			if(upField.equals(Field.fieldtoPosition(AStar.getNextField(karte ,ownPlayer.getPosition().x, ownPlayer.getPosition().y,getFlag(map).x, getFlag(map).y, ownPlayer))))return Player.Action.MOVE_UP;
+			if(downField.equals(Field.fieldtoPosition(AStar.getNextField(karte ,ownPlayer.getPosition().x, ownPlayer.getPosition().y,getFlag(map).x, getFlag(map).y, ownPlayer))))return Player.Action.MOVE_DOWN;
+		}
+		return null;
+	}
+	}
+
+
+
+

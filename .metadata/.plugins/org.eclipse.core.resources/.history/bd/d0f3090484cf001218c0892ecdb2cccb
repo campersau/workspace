@@ -1,0 +1,25 @@
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.player.Player.Action;
+import core.player.PlayerController;
+
+
+public class ersterVersuch extends PlayerController{
+
+	@Override
+	public String getName() {
+		return "kannnix";
+	}
+
+	@Override
+	public String getAuthor() {
+		return "Fabi";
+	}
+
+	@Override
+	public Action think(AiMapInfo map, AiPlayerInfo[] enemies,
+			AiPlayerInfo ownPlayer) {
+		return null;
+	}
+
+}

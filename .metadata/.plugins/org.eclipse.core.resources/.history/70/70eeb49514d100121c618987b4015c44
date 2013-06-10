@@ -1,0 +1,625 @@
+import java.util.LinkedList;
+
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.constants.*;
+import core.map.FieldType;
+import core.player.*;
+
+public class AStar {
+
+	private static LinkedList<Field> openlist = new LinkedList();
+	private static LinkedList<Field> closedlist = new LinkedList();
+
+	public AStar(){}
+
+	//return field wich is the next to go to
+	public static Field getNextField(Map map, Position start1,Position target1,AiMapInfo mapinfo) {
+		Field start = new Field(start1.x,start1.y);
+		Field target = new Field(target1.x,target1.y);
+
+		//cancel if already on targetpoint
+		if(target.equals(start))return start;
+
+		start.setVarG(0);
+		openlist.add(start);
+		boolean targetnotfound=true;
+
+		Field finaltarget = start;
+
+		while(targetnotfound){
+
+			//search for field in openlist with the lowest F
+			Field temporary=openlist.get(0);
+			int position=0;
+			for (int i=1;i<openlist.size();i++)
+				if(temporary.getVarF()>openlist.get(i).getVarF()){
+					temporary=openlist.get(i);
+					position = i;
+				}
+
+			openlist.remove(position);
+			closedlist.add(temporary);
+
+			finaltarget = addpointtoopen(openlist,closedlist,map,temporary,target,mapinfo);
+		}
+
+		//trace back to start
+		Field temporary = finaltarget;
+
+		while(temporary.getPrev()!=start){
+			temporary=temporary.getPrev();
+		}
+		return temporary;
+	}
+
+	private static Field addpointtoopen(LinkedList<Field> openlist, LinkedList<Field> closedlist, Map map, Field point, Field target, AiMapInfo mapinfo){
+
+		int x = point.getX();
+		int y = point.getY();
+		int upx = x;
+		int upy = y-1;
+		int downx = x;
+		int downy = y+1;
+		int leftx = x-1;
+		int lefty = y;
+		int rightx = x+1;
+		int righty = y;
+
+		boolean upinlist=false;
+		boolean downinlist=false;
+		boolean leftinlist=false;
+		boolean rightinlist=false;
+
+		boolean upinlist2=false;
+		boolean downinlist2=false;
+		boolean leftinlist2=false;
+		boolean rightinlist2=false;
+
+		//checks if surrounding fields are already in either open- or closed -list
+
+		for(int i = 0; i<openlist.size();i++)
+			if(map.field[upy][upx].equals(openlist.get(i)))upinlist = true;
+		for(int i = 0; i<closedlist.size();i++)
+			if(map.field[upy][upx].equals(closedlist.get(i)))upinlist2 = true;
+
+		for(int i = 0; i<openlist.size();i++)
+			if(map.field[downy][downx].equals(openlist.get(i)))downinlist = true;
+		for(int i = 0; i<closedlist.size();i++)
+			if(map.field[downy][downx].equals(closedlist.get(i)))downinlist2 = true;
+
+		for(int i = 0; i<openlist.size();i++)
+			if(map.field[lefty][leftx].equals(openlist.get(i)))leftinlist = true;
+		for(int i = 0; i<closedlist.size();i++)
+			if(map.field[lefty][leftx].equals(closedlist.get(i)))leftinlist2 = true;
+
+		for(int i = 0; i<openlist.size();i++)
+			if(map.field[righty][rightx].equals(openlist.get(i)))rightinlist = true;
+		for(int i = 0; i<closedlist.size();i++)
+			if(map.field[righty][rightx].equals(closedlist.get(i)))rightinlist2 = true;
+
+
+
+
+		//if not in any list and not a stone, added in openlist while adjusting variables
+
+		if(!(upinlist||upinlist2||mapinfo.getField(new Position(upx, upy)).equals(FieldType.RESTRICTED_FIELD)))
+		{
+			map.field[upx][upy].setVarG(map.field[upx][upy].getState()+point.getVarG());
+			map.field[upx][upy].setVarF(map.field[upx][upy].getVarG()+map.field[upx][upy].getVarH());
+			map.field[upx][upy].setPrev(point);
+			openlist.add(map.field[upx][upy]);
+		}
+		if(!(downinlist||downinlist2||mapinfo.getField(new Position(downx, downy)).equals(FieldType.RESTRICTED_FIELD)))
+		{
+			map.field[downx][downy].setVarG(map.field[downx][downy].getState()+point.getVarG());
+			map.field[downx][downy].setVarF(map.field[downx][downy].getVarG()+map.field[downx][downy].getVarH());
+			map.field[downx][downy].setPrev(point);
+			System.out.println(map.field[downx][downy].toString());
+			openlist.add(map.field[downx][downy]);
+		}
+		if(!(leftinlist||leftinlist2||mapinfo.getField(new Position(leftx, lefty)).equals(FieldType.RESTRICTED_FIELD)))
+		{
+			map.field[leftx][lefty].setVarG(map.field[leftx][lefty].getState()+point.getVarG());
+			map.field[leftx][lefty].setVarF(map.field[leftx][lefty].getVarG()+map.field[leftx][lefty].getVarH());
+			map.field[leftx][lefty].setPrev(point);
+			openlist.add(map.field[lefty][leftx]);
+		}
+		if(!(rightinlist||rightinlist2||mapinfo.getField(new Position(rightx, righty)).equals(FieldType.RESTRICTED_FIELD)))
+		{
+			map.field[rightx][righty].setVarG(map.field[rightx][righty].getState()+point.getVarG());
+			map.field[rightx][righty].setVarF(map.field[rightx][righty].getVarG()+map.field[rightx][righty].getVarH());
+			map.field[rightx][righty].setPrev(point);
+			System.out.println(map.field[rightx][righty].toString());
+			openlist.add(map.field[righty][rightx]);
+		}
+		
+		//if in openlist, and shorter way found adjusting variables		
+
+		if(upinlist&&mapinfo.getField(new Position(rightx, righty)).equals(FieldType.RESTRICTED_FIELD))
+		{
+			if(point.getVarG()+map.field[upy][upx].getState()<map.field[upy][upx].getVarG()){
+				map.field[upy][upx].setVarG(map.field[upy][upx].getState()+point.getVarG());
+				map.field[upy][upx].setVarF(map.field[upy][upx].getVarG()+map.field[upy][upx].getVarH());
+				map.field[upy][upx].setPrev(point);
+				openlist.add(map.field[upy][upx]);
+			}
+		}
+
+
+		if(downinlist&&mapinfo.getField(new Position(rightx, righty)).equals(FieldType.RESTRICTED_FIELD))
+		{
+			if(point.getVarG()+map.field[downy][downx].getState()<map.field[downy][downx].getVarG())
+			{
+				map.field[downy][downx].setVarG(map.field[downy][downx].getState()+point.getVarG());
+				map.field[downy][downx].setVarF(map.field[downy][downx].getVarG()+map.field[downy][downx].getVarH());
+				map.field[downy][downx].setPrev(point);
+				openlist.add(map.field[downy][downx]);
+			}
+		}
+		if(leftinlist&&mapinfo.getField(new Position(rightx, righty)).equals(FieldType.RESTRICTED_FIELD))
+		{
+			if(point.getVarG()+map.field[lefty][leftx].getState()<map.field[lefty][leftx].getVarG())
+			{
+				map.field[lefty][leftx].setVarG(map.field[lefty][leftx].getState()+point.getVarG());
+				map.field[lefty][leftx].setVarF(map.field[lefty][leftx].getVarG()+map.field[lefty][leftx].getVarH());
+				map.field[lefty][leftx].setPrev(point);
+				openlist.add(map.field[lefty][leftx]);
+			}	
+		}
+		if(rightinlist&&mapinfo.getField(new Position(rightx, righty)).equals(FieldType.RESTRICTED_FIELD))
+		{
+			if(point.getVarG()+map.field[righty][rightx].getState()<map.field[righty][rightx].getVarG())
+			{
+				map.field[righty][rightx].setVarG(map.field[righty][rightx].getState()+point.getVarG());
+				map.field[righty][rightx].setVarF(map.field[righty][rightx].getVarG()+map.field[righty][rightx].getVarH());
+				map.field[righty][rightx].setPrev(point);
+				openlist.add(map.field[righty][rightx]);
+			}
+		}
+		//returning targetfield if found, since prev is set by now, if not returning null
+
+		if(map.field[upx][upy].equals(target))return map.field[upx][upy];
+		if(map.field[downx][downy].equals(target))return map.field[downx][downy];
+		if(map.field[leftx][lefty].equals(target))return map.field[leftx][lefty];
+		if(map.field[rightx][righty].equals(target))return map.field[rightx][righty];
+
+		return null;
+
+
+
+	}
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//import java.util.LinkedList;
+//
+//import apoSkunkman.ai.ApoSkunkmanAIConstants;
+//import apoSkunkman.ai.ApoSkunkmanAIPlayer;
+//
+//
+//
+//
+//
+//
+//public class AStar {
+//
+//	private LinkedList<Field> openlist = new LinkedList();
+//	private LinkedList<Field> closedlist = new LinkedList();
+//
+//	public AStar(){}
+//
+//
+//	// return field wich is the next to go to
+//	public Field getNextField(karte map, int startx, int starty,int targetx, int targety, ApoSkunkmanAIPlayer player) {
+//		Field start = map.field[starty][startx];
+//		Field target = map.field[targety][targetx];
+//
+//		//cancel if already on targetpoint
+//		//		if(target.equals(start))return start;
+//
+//		start.setVarG(0);
+//		openlist.add(start);
+//
+//		//adds other fields if running away
+//
+//		/** try (if on skunkedfield too*/
+//		if(player.getCurSkunkmanLay()>0||start.getIsskunked())
+//			addpointtoopen(openlist,closedlist,map,start);
+//		else
+//			addpointtoopen(openlist,closedlist,map,start,target);
+//
+//
+//
+//		boolean targetnotfound=true;
+//
+//		Field finaltarget = start;
+//
+//
+//		//add waypoints
+//		while(targetnotfound){
+//
+//			//search for field in openlist with the lowest F
+//			Field temporary=openlist.get(0);
+//			int position=0;
+//			for (int i=1;i<openlist.size();i++)
+//				if(temporary.getVarF()>openlist.get(i).getVarF()){
+//					temporary=openlist.get(i);
+//					position = i;
+//				}
+//
+//
+//			openlist.remove(position);
+//			closedlist.add(temporary);
+//
+//			//again, adds other fields if running away, returns final field if found
+//			/** try (if on skunkedfield too*/
+//			if(player.getCurSkunkmanLay()>0||start.getIsskunked()){
+//				finaltarget = addpointtoopen(openlist,closedlist,map,temporary);
+//				targetnotfound = finaltarget == null;
+//			}
+//			else{
+//				finaltarget = addpointtoopen(openlist,closedlist,map,temporary,target);
+//				targetnotfound = finaltarget == null;
+//			}
+//
+//			//			System.out.println("closed: "+closedlist.toString());
+//			//			System.out.println("open: "+openlist.toString());
+//		}
+//
+//
+//
+//
+//		//trace back to start
+//		Field temporary = finaltarget;
+//
+//		//		System.out.println(finaltarget.toString());
+//
+//		if(finaltarget.equals(start))//needs second check, in case of running away(other target is chosen)
+//			return start;
+//
+//		while(temporary.getPrev()!=start){
+//			player.drawCircle(temporary.getX()+0.5f,temporary.getY()+0.5f,(float) 0.6,true,250);
+//
+//			temporary=temporary.getPrev();
+//		}
+//
+//		return temporary;
+//	}
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	//adds surrounding fields to openlist, if not 1. a rock 2. in openlist 3. in closedlist	
+//	//and sets prev and varG and varF, also returns targetfield if found
+//	private static Field addpointtoopen(LinkedList<Field> openlist, LinkedList<Field> closedlist, karte map, Field point, Field target){
+//
+//
+//		int x = point.getX();
+//		int y = point.getY();
+//		int upx = x;
+//		int upy = y-1;
+//		int downx = x;
+//		int downy = y+1;
+//		int leftx = x-1;
+//		int lefty = y;
+//		int rightx = x+1;
+//		int righty = y;
+//
+//		boolean upinlist=false;
+//		boolean downinlist=false;
+//		boolean leftinlist=false;
+//		boolean rightinlist=false;
+//
+//		boolean upinlist2=false;
+//		boolean downinlist2=false;
+//		boolean leftinlist2=false;
+//		boolean rightinlist2=false;
+//
+//
+//		//checks if surrounding fields are already in either open- or closed -list
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[upy][upx].equals(openlist.get(i)))upinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[upy][upx].equals(closedlist.get(i)))upinlist2 = true;
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[downy][downx].equals(openlist.get(i)))downinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[downy][downx].equals(closedlist.get(i)))downinlist2 = true;
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[lefty][leftx].equals(openlist.get(i)))leftinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[lefty][leftx].equals(closedlist.get(i)))leftinlist2 = true;
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[righty][rightx].equals(openlist.get(i)))rightinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[righty][rightx].equals(closedlist.get(i)))rightinlist2 = true;
+//
+//
+//		//if not in any list and not a stone, added in openlist while adjusting variables
+//
+//		if(!(upinlist||upinlist2||map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE))
+//		{
+//			map.field[upy][upx].setVarG(map.field[upy][upx].getState()+point.getVarG());
+//			map.field[upy][upx].setVarF(map.field[upy][upx].getVarG()+map.field[upy][upx].getVarH());
+//			map.field[upy][upx].setPrev(point);
+//			openlist.add(map.field[upy][upx]);
+//		}
+//		if(!(downinlist||downinlist2||map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE))
+//		{
+//			map.field[downy][downx].setVarG(map.field[downy][downx].getState()+point.getVarG());
+//			map.field[downy][downx].setVarF(map.field[downy][downx].getVarG()+map.field[downy][downx].getVarH());
+//			map.field[downy][downx].setPrev(point);
+//			System.out.println(map.field[downy][downx].toString());
+//			openlist.add(map.field[downy][downx]);
+//		}
+//		if(!(leftinlist||leftinlist2||map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE))
+//		{
+//			map.field[lefty][leftx].setVarG(map.field[lefty][leftx].getState()+point.getVarG());
+//			map.field[lefty][leftx].setVarF(map.field[lefty][leftx].getVarG()+map.field[lefty][leftx].getVarH());
+//			map.field[lefty][leftx].setPrev(point);
+//			openlist.add(map.field[lefty][leftx]);
+//		}
+//		if(!(rightinlist||rightinlist2||map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE))
+//		{
+//			map.field[righty][rightx].setVarG(map.field[righty][rightx].getState()+point.getVarG());
+//			map.field[righty][rightx].setVarF(map.field[righty][rightx].getVarG()+map.field[righty][rightx].getVarH());
+//			map.field[righty][rightx].setPrev(point);
+//			System.out.println(map.field[righty][rightx].toString());
+//			openlist.add(map.field[righty][rightx]);
+//		}
+//
+//
+//		//if in openlist, and shorter way found adjusting variables		
+//
+//		if(upinlist&&map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[upy][upx].getState()<map.field[upy][upx].getVarG()){
+//				map.field[upy][upx].setVarG(map.field[upy][upx].getState()+point.getVarG());
+//				map.field[upy][upx].setVarF(map.field[upy][upx].getVarG()+map.field[upy][upx].getVarH());
+//				map.field[upy][upx].setPrev(point);
+//				openlist.add(map.field[upy][upx]);
+//			}
+//		}
+//
+//
+//		if(downinlist&&map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[downy][downx].getState()<map.field[downy][downx].getVarG())
+//			{
+//				map.field[downy][downx].setVarG(map.field[downy][downx].getState()+point.getVarG());
+//				map.field[downy][downx].setVarF(map.field[downy][downx].getVarG()+map.field[downy][downx].getVarH());
+//				map.field[downy][downx].setPrev(point);
+//				openlist.add(map.field[downy][downx]);
+//			}
+//		}
+//		if(leftinlist&&map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[lefty][leftx].getState()<map.field[lefty][leftx].getVarG())
+//			{
+//				map.field[lefty][leftx].setVarG(map.field[lefty][leftx].getState()+point.getVarG());
+//				map.field[lefty][leftx].setVarF(map.field[lefty][leftx].getVarG()+map.field[lefty][leftx].getVarH());
+//				map.field[lefty][leftx].setPrev(point);
+//				openlist.add(map.field[lefty][leftx]);
+//			}	
+//		}
+//		if(rightinlist&&map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[righty][rightx].getState()<map.field[righty][rightx].getVarG())
+//			{
+//				map.field[righty][rightx].setVarG(map.field[righty][rightx].getState()+point.getVarG());
+//				map.field[righty][rightx].setVarF(map.field[righty][rightx].getVarG()+map.field[righty][rightx].getVarH());
+//				map.field[righty][rightx].setPrev(point);
+//				openlist.add(map.field[righty][rightx]);
+//			}
+//		}
+//
+//
+//		//returning targetfield if found, since prev is set by now, if not returning null
+//
+//		if(map.field[upy][upx].equals(target))return map.field[upy][upx];
+//		if(map.field[downy][downx].equals(target))return map.field[downy][downx];
+//		if(map.field[lefty][leftx].equals(target))return map.field[lefty][leftx];
+//		if(map.field[righty][rightx].equals(target))return map.field[righty][rightx];
+//
+//		return null;
+//	}
+//
+//
+//
+//	//searches the next easy accessable field, wich is not in the radius of a skunkman
+//
+//	private static Field addpointtoopen(LinkedList<Field> openlist, LinkedList<Field> closedlist, karte map, Field point){
+//
+//		if(!point.getIsskunked()) return point;
+//
+//
+//
+//		int x = point.getX();
+//		int y = point.getY();
+//		int upx = x;
+//		int upy = y-1;
+//		int downx = x;
+//		int downy = y+1;
+//		int leftx = x-1;
+//		int lefty = y;
+//		int rightx = x+1;
+//		int righty = y;
+//
+//		boolean upinlist=false;
+//		boolean downinlist=false;
+//		boolean leftinlist=false;
+//		boolean rightinlist=false;
+//
+//		boolean upinlist2=false;
+//		boolean downinlist2=false;
+//		boolean leftinlist2=false;
+//		boolean rightinlist2=false;
+//
+//
+//		//checks if surrounding fields are already in either open- or closed -list
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[upy][upx].equals(openlist.get(i)))upinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[upy][upx].equals(closedlist.get(i)))upinlist2 = true;
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[downy][downx].equals(openlist.get(i)))downinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[downy][downx].equals(closedlist.get(i)))downinlist2 = true;
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[lefty][leftx].equals(openlist.get(i)))leftinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[lefty][leftx].equals(closedlist.get(i)))leftinlist2 = true;
+//
+//		for(int i = 0; i<openlist.size();i++)
+//			if(map.field[righty][rightx].equals(openlist.get(i)))rightinlist = true;
+//		for(int i = 0; i<closedlist.size();i++)
+//			if(map.field[righty][rightx].equals(closedlist.get(i)))rightinlist2 = true;
+//
+//
+//
+//
+//		//		System.out.println(point.toString());
+//
+//		//Adds fields to openlist if not in either list nor a stone or bush
+//
+//		if(!(upinlist||upinlist2||map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))
+//		{
+//			map.field[upy][upx].setVarG(map.field[upy][upx].getState()+point.getVarG());
+//			map.field[upy][upx].setVarF(map.field[upy][upx].getVarG()+map.field[upy][upx].getVarH());
+//			map.field[upy][upx].setPrev(point);
+//			openlist.add(map.field[upy][upx]);
+//		}
+//		if(!(downinlist||downinlist2||map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))
+//		{
+//			map.field[downy][downx].setVarG(map.field[downy][downx].getState()+point.getVarG());
+//			map.field[downy][downx].setVarF(map.field[downy][downx].getVarG()+map.field[downy][downx].getVarH());
+//			map.field[downy][downx].setPrev(point);
+//			System.out.println(map.field[downy][downx].toString());
+//			openlist.add(map.field[downy][downx]);
+//		}
+//		if(!(leftinlist||leftinlist2||map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))
+//		{
+//			map.field[lefty][leftx].setVarG(map.field[lefty][leftx].getState()+point.getVarG());
+//			map.field[lefty][leftx].setVarF(map.field[lefty][leftx].getVarG()+map.field[lefty][leftx].getVarH());
+//			map.field[lefty][leftx].setPrev(point);
+//			openlist.add(map.field[lefty][leftx]);
+//		}
+//		if(!(rightinlist||rightinlist2||map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))
+//		{
+//			map.field[righty][rightx].setVarG(map.field[righty][rightx].getState()+point.getVarG());
+//			map.field[righty][rightx].setVarF(map.field[righty][rightx].getVarG()+map.field[righty][rightx].getVarH());
+//			map.field[righty][rightx].setPrev(point);
+//			System.out.println(map.field[righty][rightx].toString());
+//			openlist.add(map.field[righty][rightx]);
+//		}
+//
+//		//if already in oenlist
+//
+//
+//		if(upinlist&&map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[upy][upx].getState()<map.field[upy][upx].getVarG()){
+//				map.field[upy][upx].setVarG(map.field[upy][upx].getState()+point.getVarG());
+//				map.field[upy][upx].setVarF(map.field[upy][upx].getVarG()+map.field[upy][upx].getVarH());
+//				map.field[upy][upx].setPrev(point);
+//				openlist.add(map.field[upy][upx]);
+//			}
+//		}
+//
+//
+//		if(downinlist&&map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[downy][downx].getState()<map.field[downy][downx].getVarG())
+//			{
+//				map.field[downy][downx].setVarG(map.field[downy][downx].getState()+point.getVarG());
+//				map.field[downy][downx].setVarF(map.field[downy][downx].getVarG()+map.field[downy][downx].getVarH());
+//				map.field[downy][downx].setPrev(point);
+//				openlist.add(map.field[downy][downx]);
+//			}
+//		}
+//		if(leftinlist&&map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[lefty][leftx].getState()<map.field[lefty][leftx].getVarG())
+//			{
+//				map.field[lefty][leftx].setVarG(map.field[lefty][leftx].getState()+point.getVarG());
+//				map.field[lefty][leftx].setVarF(map.field[lefty][leftx].getVarG()+map.field[lefty][leftx].getVarH());
+//				map.field[lefty][leftx].setPrev(point);
+//				openlist.add(map.field[lefty][leftx]);
+//			}	
+//		}
+//		if(rightinlist&&map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE)
+//		{
+//			if(point.getVarG()+map.field[righty][rightx].getState()<map.field[righty][rightx].getVarG())
+//			{
+//				map.field[righty][rightx].setVarG(map.field[righty][rightx].getState()+point.getVarG());
+//				map.field[righty][rightx].setVarF(map.field[righty][rightx].getVarG()+map.field[righty][rightx].getVarH());
+//				map.field[righty][rightx].setPrev(point);
+//				openlist.add(map.field[righty][rightx]);
+//			}
+//		}
+//
+//
+//		//returns first field being not in range of a skunkman
+//
+//		if(!map.field[upy][upx].getIsskunked()&&!(map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[upy][upx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH)) return map.field[upy][upx];
+//		if(!map.field[downy][downx].getIsskunked()&&!(map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[downy][downx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))return map.field[downy][downx];
+//		if(!map.field[lefty][leftx].getIsskunked()&&!(map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[lefty][leftx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))return map.field[lefty][leftx];
+//		if(!map.field[righty][rightx].getIsskunked()&&!(map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_STONE||map.field[righty][rightx].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH))return map.field[righty][rightx];
+//
+//
+//		return null;
+//	}
+//
+//
+//
+//
+//}

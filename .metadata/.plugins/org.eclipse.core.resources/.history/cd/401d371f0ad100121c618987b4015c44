@@ -1,0 +1,99 @@
+package zweiterVersuch;
+import java.io.ObjectInputStream.GetField;
+import java.util.LinkedList;
+
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.map.FieldType;
+
+public class AStar {
+
+	LinkedList<Field> openList = new LinkedList<Field>();
+	LinkedList<Field> closedList = new LinkedList<Field>();
+
+	public Position getnextPosition(AiMapInfo map, AiPlayerInfo player, Position startposition, Position targetposition) {
+		Position erg = new Position();
+		Field start = new Field( startposition.x, startposition.y);
+		Field target = new Field(targetposition.x, targetposition.y);
+
+		//cancel if already on targetpoint
+		if(target.equals(start))return startposition;
+
+		isfirst(start);
+
+		//find lowest F in openlist
+		Field temp = openList.get(0);
+		int pos = 0;
+		
+		for (int i = 0; i < openList.size(); i++) {
+			if (temp.getF) {
+				
+			}
+			
+		}
+
+		movabletoopen(player, startposition, targetposition, start);
+
+		closedList.add(start);
+		openList.remove(start);
+
+		return erg;
+
+	}
+
+	private void isfirst(Field start) {
+		if (openList == null) {
+			start.setG(0);
+			openList.add(start);
+		}
+	}
+
+	private void movabletoopen(AiPlayerInfo player, Position startposition,
+			Position targetposition, Field start) {
+		//Lindkedlist of up, down, left, right Positions
+		LinkedList<Position> movable = new LinkedList<Position>();
+		movable.addAll(startposition.getD4Neighbors());
+
+		for (int i = 0; i < movable.size(); i++) {				//itterate thrue movable
+			if (movable.get(i).equals(FieldType.STABLE_FIELD)||			//check if field is movable
+					movable.get(i).equals(FieldType.UNSTABLE_FIELD)) {
+				if (!isinclosedList(movable.get(i))) {				//check if is in closedlist
+					addPositiontoopenList(player, targetposition, start, movable, i);
+				}
+			}
+		}
+	}
+
+	private void addPositiontoopenList(AiPlayerInfo player,Position targetposition, Field start, LinkedList<Position> movable,int i) {
+		openList.add(new Field(movable.get(i).x, movable.get(i).y,start,
+				(int) player.getPosition().euclideanDistance(movable.get(i)),(int) movable.get(i).euclideanDistance(targetposition)));
+	}
+
+	private boolean isinopenList(Position position) {
+		//check if position is in openList
+
+		for (int i = 0; i < openList.size(); i++) {
+			if (position.equals(new Position(openList.get(i).x, openList.get(i).y))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isinclosedList(Position position) {
+
+		//check if position is inc loslist
+
+		for (int i = 0; i < closedList.size(); i++) {
+			if (position.equals(new Position(closedList.get(i).x, closedList.get(i).y))) {
+				return true;
+			}
+		}	
+		return false;
+	}
+
+
+
+
+}

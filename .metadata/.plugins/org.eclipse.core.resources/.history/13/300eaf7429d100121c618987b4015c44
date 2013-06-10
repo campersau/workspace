@@ -1,0 +1,125 @@
+
+import java.io.ObjectInputStream.GetField;
+import java.util.LinkedList;
+
+import client.gui.elements.AiSelector;
+
+
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.map.FieldType;
+
+public class AStar {
+
+	public AStar(){
+
+	}
+
+	LinkedList<Field> openList = new LinkedList<Field>();
+	LinkedList<Field> closedList = new LinkedList<Field>();
+
+	//giebt die nächste zu gehende Position zurück
+	public Position getnextPosition(AiMapInfo map, AiPlayerInfo player, Position startposition, Position targetposition) {
+		Field start = new Field( startposition.x, startposition.y);
+		Field target = new Field(targetposition.x, targetposition.y);
+
+		//cancel if already on targetpoint
+		if(target.equals(start))return startposition;
+
+		isfirst(start);
+
+		while (!target.equals(start)) {
+			findLowF();
+			Position actualposition = new Position(closedList.getLast().x, closedList.getLast().y);
+			movabletoopen(player, actualposition, targetposition, start, map);
+		}
+
+		Position erg = new Position(closedList.get(1).x,closedList.get(1).y);
+		return erg;
+
+	}
+
+	//findet kleinste f in openlist und fügt es in die colosedlist
+	private void findLowF() {
+		Field temp = openList.get(0);
+		int pos = 0;
+
+		for (int i = 1; i < openList.size(); i++) {
+			if (openList.get(i).getF()<temp.getF()) {
+				temp = openList.get(i);
+				pos = i;
+			}	
+		}
+		closedList.add(temp);
+		openList.remove(pos);
+	}
+
+	//wenn openlist lehr ist, füge ein
+	private void isfirst(Field start) {
+		if (openList.isEmpty()) {
+			start.setG(0);
+			openList.add(start);
+		}
+	}
+
+	//überprüft, ob die felder begehbar sind
+	private void movabletoopen(AiPlayerInfo player, Position startposition,
+			Position targetposition, Field start, AiMapInfo map) {
+		//Lindkedlist of up, down, left, right Positions
+		LinkedList<Position> movable = new LinkedList<Position>();
+		movable.addAll(startposition.getD4Neighbors());
+
+		for (int i = 0; i < movable.size(); i++) {				//itterate thrue movable
+			if (getFieldType(movable.get(i), map)== FieldType.STABLE_FIELD||			//check if field is movable
+					getFieldType(movable.get(i), map)==FieldType.UNSTABLE_FIELD) {
+				if (isinclosedList(movable.get(i))) {				//check if is in closedlist
+					addPositiontoopenList(player, targetposition, start, movable, i);
+				}
+			}
+		}
+	}
+
+	private FieldType getFieldType(Position position, AiMapInfo map) {
+		FieldType field = map.getField(position);
+		return field;
+	}
+
+	//fügt begehbare felder in die openlist ein
+	private void addPositiontoopenList(AiPlayerInfo player,Position targetposition, Field start, LinkedList<Position> movable,int i) {
+		openList.add(new Field(movable.get(i).x, movable.get(i).y,start,
+				(int) player.getPosition().euclideanDistance(movable.get(i)),(int) movable.get(i).euclideanDistance(targetposition)));
+	}
+
+	//überprüft ob feld bereits in opnelist ist
+	private boolean isinopenList(Position position) {
+		for (int i = 0; i < openList.size(); i++) {
+			if (position == new Position(openList.get(i).x, openList.get(i).y)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//überprüft ob feld bereits in closedlist ist
+	private boolean isinclosedList(Position position) {
+
+		for (int i = 0; i < closedList.size(); i++) {
+
+			if (position.x == new Position(closedList.get(i).x, closedList.get(i).y).x &&
+					position.y == new Position(closedList.get(i).x, closedList.get(i).y).y) {
+				return true;
+
+			}
+
+		}	
+		return false;
+	}
+
+	public Position fieldtoPosition(Field field) {
+		Position erg = new Position(field.x, field.y);
+		return erg;
+	}
+
+
+}

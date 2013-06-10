@@ -1,0 +1,15 @@
+
+public class AritmetischeAusdrücke {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		int a,b;
+		a=3;
+		b=10;
+		System.out.println(b/a);
+
+	}
+
+}

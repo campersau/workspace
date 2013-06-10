@@ -1,0 +1,9 @@
+
+public class ErrorSyso {
+	public static void main(String[] args) 
+	{
+		System.err.println("das ist ein error");
+
+	}
+
+}

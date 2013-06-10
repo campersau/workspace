@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="java.lang.Comparable"/>
+<fullyQualifiedTypeName name="java.util.Stack"/>
+<fullyQualifiedTypeName name="T"/>
+<fullyQualifiedTypeName name="java.lang.Object"/>
+<fullyQualifiedTypeName name="java.lang.Integer"/>
+<fullyQualifiedTypeName name="javax.swing.border.EmptyBorder"/>
+<fullyQualifiedTypeName name="java.util.Queue"/>
+<fullyQualifiedTypeName name="java.util.AbstractQueue"/>
+<fullyQualifiedTypeName name="aud.DList"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+<fullyQualifiedTypeName name="javax.swing.text.StyledEditorKit.ForegroundAction"/>
+<fullyQualifiedTypeName name="aud.AVLTree"/>
+<fullyQualifiedTypeName name="aud.util.DotViewer"/>
+<fullyQualifiedTypeName name="aud.util.Graphviz"/>
+<fullyQualifiedTypeName name="aud.RedBlackTree"/>
+<fullyQualifiedTypeName name="java.util.NoSuchElementException"/>
+<fullyQualifiedTypeName name="client.game.factory.PlayerControllerLoader.PlayerControllerType"/>
+<fullyQualifiedTypeName name="client.gui.match.PlayerInfoPanel"/>
+<fullyQualifiedTypeName name="Map"/>
+<fullyQualifiedTypeName name="AStar"/>
+<fullyQualifiedTypeName name="javax.swing.text.Position"/>
+<fullyQualifiedTypeName name="core.player.Player"/>
+<fullyQualifiedTypeName name="core.player.PlayerController"/>
+<fullyQualifiedTypeName name="core.ai.AiPlayerInfo"/>
+<fullyQualifiedTypeName name="java.util.LinkedList"/>
+<fullyQualifiedTypeName name="zweiterVersuch.Field"/>
+<fullyQualifiedTypeName name="core.player.Player.Action"/>
+<fullyQualifiedTypeName name="java.lang.String"/>
+<fullyQualifiedTypeName name="java.io.ObjectInputStream.GetField"/>
+<fullyQualifiedTypeName name="core.map.FieldType"/>
+<fullyQualifiedTypeName name="client.gui.elements.AiSelector"/>
+<fullyQualifiedTypeName name="core.ai.AiMapInfo"/>
+<fullyQualifiedTypeName name="core.Position"/>
+<fullyQualifiedTypeName name="java.lang.Math"/>
+</qualifiedTypeNameHistroy>

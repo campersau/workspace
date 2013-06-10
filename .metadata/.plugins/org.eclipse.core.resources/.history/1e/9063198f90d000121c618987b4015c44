@@ -1,0 +1,55 @@
+package zweiterVersuch;
+import java.io.ObjectInputStream.GetField;
+import java.util.LinkedList;
+
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.map.FieldType;
+
+public class AStar {
+	
+	LinkedList<Field> openList = new LinkedList<Field>();
+	LinkedList<Field> closedList = new LinkedList<Field>();
+	
+	public Position getnextPosition(AiMapInfo map, AiPlayerInfo player, Position startposition, Position targetposition) {
+		Position erg = new Position();
+		Field start = new Field( startposition.x, startposition.y);
+		Field target = new Field(targetposition.x, targetposition.y);
+		
+		openList.add(start);
+		
+		//Lindkedlist of up, down, left, right Positions
+		LinkedList<Position> movable = new LinkedList<Position>();
+		movable.addAll(startposition.getD4Neighbors());
+		
+		
+		
+		if (movable.get(0).equals(FieldType.STABLE_FIELD)||
+				movable.get(0).equals(FieldType.UNSTABLE_FIELD)) {
+			openList.add(new Field(movable.get(0).x, movable.get(0).y,start));
+		}
+		
+		if (movable.get(1).equals(FieldType.STABLE_FIELD)||
+				movable.get(0).equals(FieldType.UNSTABLE_FIELD)) {
+			openList.add(new Field(movable.get(0).x, movable.get(0).y,start));
+		}
+		
+		if (movable.get(2).equals(FieldType.STABLE_FIELD)||
+				movable.get(0).equals(FieldType.UNSTABLE_FIELD)) {
+			openList.add(new Field(movable.get(0).x, movable.get(0).y,start));
+		}
+		
+		if (movable.get(3).equals(FieldType.STABLE_FIELD)||
+				movable.get(0).equals(FieldType.UNSTABLE_FIELD)) {
+			openList.add(new Field(movable.get(0).x, movable.get(0).y,start));
+		}
+		
+		closedList.add(start);
+		openList.remove(start);
+		
+		
+		return erg;
+		
+	}
+}

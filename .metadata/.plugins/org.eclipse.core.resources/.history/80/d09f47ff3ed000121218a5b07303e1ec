@@ -1,0 +1,190 @@
+import java.util.LinkedList;
+
+public class Field {
+	private int x,y;
+	private int varF,varH,varG;			//algorithm values
+	private int state = 1	;			//walk value
+	private Field prev = null;			//previous field
+
+	public Field(int x, int y)	
+	{
+		this.x=x;
+		this.y=y;		
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public int getVarF() {
+		return varF;
+	}
+
+	public void setVarF(int varF) {
+		this.varF = varF;
+	}
+
+	public int getVarH() {
+		return varH;
+	}
+
+	public void setVarH(int varH) {
+		this.varH = varH;
+	}
+
+	public int getVarG() {
+		return varG;
+	}
+
+	public void setVarG(int varG) {
+		this.varG = varG;
+	}
+
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+
+	public Field getPrev() {
+		return prev;
+	}
+
+	public void setPrev(Field prev) {
+		this.prev = prev;
+	}
+	
+	//checks in a list
+	public boolean notinlist(LinkedList<Field> openlist) {
+		for(int i = 0; i<openlist.size();i++)
+			if(this.equals(openlist.get(i)))return false;
+		return true;
+	}
+
+}
+
+
+
+
+
+//import java.util.LinkedList;
+//
+//
+//public class Field {
+//	
+//	private int x,y;
+//	private int varF,varH,varG;			//algorithm values
+//	private int condition;				//grass, bush, stone 
+//	private int state = 1	;			//walk value
+//	private Field prev = null;			//previous field
+//	private boolean isskunked;
+//										
+//	
+//	public Field(int x, int y, int condition)	
+//	{
+//		this.x=x;
+//		this.y=y;		
+//		this.condition = condition;
+//	}
+//	
+//	
+//	
+//	public boolean getIsskunked(){
+//		return this.isskunked;
+//	}
+//	public void setIsskunked(boolean in){
+//		 this.isskunked = in;
+//	}
+//	
+//	public int getVarF() {
+//		return varF;
+//	}
+//
+//	public void setVarF(int varF) {
+//		this.varF = varF;
+//	}
+//
+//	public int getVarH() {
+//		return varH;
+//	}
+//
+//	public void setVarH(int varH) {
+//		this.varH = varH;
+//	}
+//
+//	public int getVarG() {
+//		return varG;
+//	}
+//
+//	public void setVarG(int varG) {
+//		this.varG = varG;
+//	}
+//
+//	public int getCondition() {
+//		return condition;
+//	}
+//
+//	public void setCondition(int condition) {
+//		this.condition = condition;
+//	}
+//
+//	public int getState() {
+//		return state;
+//	}
+//
+//	public void setState(int state) {
+//		this.state = state;
+//	}
+//
+//	public Field getPrev() {
+//		return prev;
+//	}
+//
+//	public void setPrev(Field prev) {
+//		this.prev = prev;
+//	}
+//
+//	public int getX() {
+//		return x;
+//	}
+//
+//	public int getY() {
+//		return y;
+//	}
+//
+//	public String toString() {
+//		if(this.getPrev()!=null)
+//		{String str = "["+this.y+"/"+this.x+"]"+":"+"{"+this.getPrev().getY()+"/"+this.getPrev().getX()+"}";
+//		return str;}
+//		else {String str = "["+this.y+"/"+this.x+"]"+"-Non";
+//		return str;}
+//		
+//	}
+//	
+//	
+//	//checks in a list
+//	public boolean notinlist(LinkedList<Field> openlist) {
+//		for(int i = 0; i<openlist.size();i++)
+//			if(this.equals(openlist.get(i)))return false;
+//		return true;
+//	}
+//	
+//	
+//	
+//		
+//
+//}

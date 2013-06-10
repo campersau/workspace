@@ -1,0 +1,27 @@
+1370613070284	Delete element
+1370613118338	Rename type 'Map'
+1370618697277	Delete element
+1370618729947	Delete element
+1370618734676	Delete element
+1370618980817	Delete element
+1370698912674	Delete element
+1370713338388	Rename local variable 'i'
+1370713348371	Rename local variable 'n'
+1370778287294	Extract method 'checkmovable'
+1370778339119	Extract method 'isfirst'
+1370778518108	Rename method 'checkmovable'
+1370779740685	Extract method 'isinList'
+1370782448499	Extract method 'addPositiontoopenList'
+1370785312410	Extract method 'findLowF'
+1370788168139	Rename method 'movabletoopen'
+1370788323707	Rename method 'movebletoopen'
+1370789141876	Extract method 'getFlag'
+1370789707490	Delete element
+1370789708943	Delete element
+1370789710231	Delete element
+1370789711585	Delete element
+1370789726649	Move compilation unit
+1370789731702	Move compilation unit
+1370789733486	Move compilation unit
+1370789735998	Delete element
+1370798773836	Delete element

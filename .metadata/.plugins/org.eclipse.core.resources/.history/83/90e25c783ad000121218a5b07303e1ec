@@ -1,0 +1,59 @@
+import java.io.ObjectInputStream.GetField;
+
+import client.game.factory.PlayerControllerLoader.PlayerControllerType;
+import client.gui.match.PlayerInfoPanel;
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.map.FieldType;
+import core.player.Player;
+import core.player.Player.Action;
+import core.player.PlayerController;
+
+
+public class ersterVersuch extends PlayerController{
+
+	@Override
+	public String getName() {
+		return "kannnix";
+	}
+
+	@Override
+	public String getAuthor() {
+		return "Fabi";
+	}
+	public Position getFlag(AiMapInfo map){
+		Position erg = null;
+		for (int i = 0; i < map.getHeight(); i++){
+			for (int n = 0; n < map.getWidth(); n++){
+				Object[][] field = new Field[i][n];
+				if(field[i][n].equals(FieldType.DROPPED_FIELD))erg = erg.add(i, n);
+			}
+		}
+		return erg;
+	}
+
+
+	@Override
+	public Action think(AiMapInfo map, AiPlayerInfo[] enemies,
+			AiPlayerInfo ownPlayer) {
+
+		FieldType rightField = map.getField(ownPlayer.getPosition().right());
+		FieldType leftField = map.getField(ownPlayer.getPosition().left());
+		FieldType downField = map.getField(ownPlayer.getPosition().down());
+		FieldType upField = map.getField(ownPlayer.getPosition().up());
+
+		
+		
+		if( map.isParkourMap()){
+
+
+			Field gehen = new Field(0,0);
+			gehen = AStar.this.getNextField(map, ownPlayer.getPosition(), ownPlayer.getPosition(), getFlag(map), getFlag(map), ownPlayer.getPosition());
+
+		}
+		return null;
+	}
+
+
+}

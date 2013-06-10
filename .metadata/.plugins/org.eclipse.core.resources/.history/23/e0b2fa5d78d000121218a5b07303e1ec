@@ -1,0 +1,23 @@
+package zweiterVersuch;
+import java.util.LinkedList;
+
+import core.Position;
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+
+public class AStar {
+	
+	LinkedList<Field> openList = new LinkedList<Field>();
+	LinkedList<Field> closedList = new LinkedList<Field>();
+	
+	public Position getnextPosition(AiMapInfo map, AiPlayerInfo player, Position startposition, Position targetposition) {
+		Position erg = new Position();
+		Field start = new Field( startposition.x, startposition.y);
+		Field target = new Field(targetposition.x, targetposition.y);
+		
+		
+		
+		return erg;
+		
+	}
+}

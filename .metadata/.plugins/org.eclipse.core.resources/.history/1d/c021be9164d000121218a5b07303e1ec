@@ -1,0 +1,167 @@
+import core.Position;
+import core.ai.AiMapInfo;
+import core.map.FieldType;
+
+public class Map {
+
+	Field[][] field;
+
+	public Map(int[][] level)
+	{
+		this.field = new Field[level.length][level[0].length];
+		for (int y = 0; y < level.length-1; y++){
+			for (int x = 0; x < level[0].length-1; x++){
+				field[y][x] = new Field(y,x);
+				System.out.println(x);
+				System.out.println(y);
+			}
+		}
+	}
+
+	public void refresh(AiMapInfo level, Position target){
+
+		//normal values
+
+		for (int i = 0; i < level.getHeight(); i++){
+			for (int n = 0; n < level.getWidth(); n++){
+				if(field[i][n].equals(FieldType.DROPPED_FIELD))field[i][n].setState(900);
+				if(field[i][n].equals(FieldType.ACTION_FIELD_BOMB))field[i][n].setState(900);
+				if(field[i][n].equals(FieldType.ACTION_FIELD_FLAG))field[i][n].setState(1);
+				if(field[i][n].equals(FieldType.UNSTABLE_FIELD))field[i][n].setState(2);
+
+				int dx = target.x - field[i][n].getX();
+				int dy = target.y - field[i][n].getX();
+				field[i][n].setVarH((int) Math.sqrt((dx*dx)+(dy*dy)));
+			}
+		}
+
+
+	}
+
+}
+
+
+
+
+
+
+
+//import org.apogames.ApoConstants;
+//
+//import apoSkunkman.ai.ApoSkunkmanAIConstants;
+//import apoSkunkman.ai.ApoSkunkmanAILevel;
+//
+//
+//public class Map {
+//	
+//	Field[][] field;
+//	
+//	//constructs map of fields
+//	
+//	public Map(byte[][] level)
+//	{
+//		this.field = new Field[level.length][level[0].length];
+//		for (int i = 0; i < level.length; i++){
+//			for (int n = 0; n < level[0].length; n++){
+//				field[i][n] = new Field(n,i,level[i][n]);
+//			}
+//		}
+//	}
+//	
+//	
+//	//Sets all values suitable to current situation
+//	public void refresh(ApoSkunkmanAILevel level, int targetx, int targety){
+//		
+//		//normal values
+//		
+//		for (int i = 0; i < level.getLevelAsByte().length; i++){
+//			for (int n = 0; n < level.getLevelAsByte()[0].length; n++){
+//				if(field[i][n].getCondition()==ApoSkunkmanAIConstants.LEVEL_FREE)field[i][n].setState(1);
+//				if(field[i][n].getCondition()==ApoSkunkmanAIConstants.LEVEL_BUSH)field[i][n].setState(400);
+//				
+//				int dx = targetx - field[i][n].getX();
+//				int dy = targety - field[i][n].getX();
+//				field[i][n].setVarH((int) Math.sqrt((dx*dx)+(dy*dy)));
+//			}
+//		}
+//		
+//		//if skunkman is layed TO DO: Explosion stops at obstacle!
+//		
+//		for (int i = 0; i < level.getLevelAsByte().length; i++){
+//			for (int n = 0; n < level.getLevelAsByte()[0].length; n++){
+//				if(level.getSkunkman(i, n)!=null){
+//				if(level.getSkunkman(i, n).isSkunkman()){
+//					
+//					explode(i,n,level.getSkunkman(i, n).getSkunkWidth());
+//					
+//				}
+//				}
+//			}
+//		}
+//	}
+//	
+//	
+//	
+//	//recursive isskunkedset
+//	private void explode(int y, int x, int range){
+//		up(y,x,range);
+//		down(y,x,range);
+//		left(y,x,range);
+//		right(y,x,range);
+//	}
+//	
+//	private void up(int y, int x, int range){
+//		field[y][x].setState(4000000+field[y][x].getState());
+//		field[y][x].setIsskunked(true);
+//		if(range>0&&field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_BUSH && field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_STONE)
+//			up(y-1,x, range-1);
+//	}
+//	
+//	private void down(int y, int x, int range){
+//		field[y][x].setState(4000000+field[y][x].getState());
+//		field[y][x].setIsskunked(true);
+//		if(range>0&&field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_BUSH && field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_STONE)
+//			down(y+1,x, range-1);
+//	}
+//	
+//	private void left(int y, int x, int range){
+//		field[y][x].setState(4000000+field[y][x].getState());
+//		field[y][x].setIsskunked(true);
+//		if(range>0&&field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_BUSH && field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_STONE)
+//			left(y,x-1, range-1);
+//	}
+//	
+//	private void right(int y, int x, int range){
+//		field[y][x].setState(4000000+field[y][x].getState());
+//		field[y][x].setIsskunked(true);
+//		if(range>0&&field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_BUSH && field[y][x].getCondition()!=ApoSkunkmanAIConstants.LEVEL_STONE)
+//			right(y,x+1, range-1);
+//	}
+//	
+//	
+//	}
+//
+//
+//
+//
+///* Graveyarded setskunked
+//for(int t = 0;t<=level.getSkunkman(i, n).getSkunkWidth();t++){
+//	if(i+t<14){
+//	field[i+t][n].setState(4000000+field[i+t][n].getState());
+//	field[i+t][n].setIsskunked(true);
+//	}
+//	if(i-t>0){
+//	field[i-t][n].setState(4000000+field[i-t][n].getState());
+//	field[i-t][n].setIsskunked(true);
+//	}
+//	if(n+t<14){
+//	field[i][n+t].setState(4000000+field[i][n+t].getState());
+//	field[i][n+t].setIsskunked(true);
+//	}
+//	if(n-t>0){
+//	field[i][n-t].setState(4000000+field[i][n-t].getState());
+//	field[i][n-t].setIsskunked(true);
+//	}
+//}
+//*/
+//

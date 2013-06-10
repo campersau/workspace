@@ -1,0 +1,30 @@
+package zweiterVersuch;
+
+import core.ai.AiMapInfo;
+import core.ai.AiPlayerInfo;
+import core.player.Player.Action;
+import core.player.PlayerController;
+
+public class zweiterVersuch extends PlayerController{
+
+	@Override
+	public String getName() {
+		return "dummer Bot";
+	}
+
+	@Override
+	public String getAuthor() {
+		return "Fabi";
+	}
+
+	@Override
+	public Action think(AiMapInfo map, AiPlayerInfo[] enemies,
+			AiPlayerInfo ownPlayer) {
+
+		if (condition) {
+			
+		}
+		
+	}
+
+}

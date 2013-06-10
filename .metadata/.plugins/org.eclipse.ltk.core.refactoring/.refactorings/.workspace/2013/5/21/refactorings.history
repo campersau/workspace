@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;C++&apos;" deleteContents="false" description="Delete resource &apos;C++&apos;" element1="/C++" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1369167131490"/>&#x0A;<refactoring comment="Rename resource &apos;C++Übung&apos; to &apos;C++&apos;" description="Rename resource &apos;C++Übung&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/C++Übung" name="C++" stamp="1369167151451" updateReferences="true"/>
+</session>

@@ -1,0 +1,53 @@
+package classes;
+
+import java.io.*;
+
+import classes.WordHashtable;
+
+public class Main {
+	
+	public static void main(String[] args) throws IOException {
+
+		// test if the user entered a filename
+		if(args[0] == null)
+		{
+			System.out.println("\n\n\tUsage: \"CountWords.java\" <filename>");
+			return;
+		}
+		
+		FileReader fr = new FileReader(args[0]);
+	 	BufferedReader br = new BufferedReader(fr);
+
+	 	int size = 60;
+	 	WordHashtable ourHash = new WordHashtable(size);
+	 	
+	 	String zeile = br.readLine();
+	 	
+	 	// read the file line for line until its at the end
+	 	while(zeile != null)
+	 	{
+	 		// We are not interested in case sensitivity
+	 		zeile = zeile.toLowerCase();
+	 		zeile = handleLineBreak(zeile, br);
+	 		ourHash.handleString(zeile);
+	 		zeile = br.readLine();
+	 	}
+	 	
+	 	ourHash.sortHashtable();
+	 	ourHash.printHashtable();
+	    
+	    br.close();
+		
+	}
+	
+	//Diese Funktion führt dazu, dass Zeilenumbrüche nicht zu zwei getrennten Wörtern führen.
+	public static String handleLineBreak (String tempZeile, BufferedReader br) throws IOException
+	{
+		do
+		{
+			if(!tempZeile.endsWith("-")) return tempZeile;
+			tempZeile = tempZeile.concat(br.readLine());		
+		}while(true);
+	}
+
+}
