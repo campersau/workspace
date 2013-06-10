@@ -140,7 +140,7 @@ public class AStar {
 	}
 
 
-	public boolean samePosition(Position positiona, Position positionb) {
+	public static boolean samePosition(Position positiona, Position positionb) {
 		if (positiona.x == positionb.x & positiona.y == positionb.y) {
 			return true;
 		}
@@ -160,7 +160,7 @@ public class AStar {
 		Position next = new Position(5, 5);
 		Position end = new Position(50, 50);
 
-		while ((next = new AStar().getnextPosition(map, next, end)) != null) {
+		while (!samePosition((next = new AStar().getnextPosition(map, next, end)), end)) {
 			System.out.println(next.toString());
 		}
 
