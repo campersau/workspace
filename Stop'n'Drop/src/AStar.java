@@ -17,7 +17,7 @@ public class AStar {
 	LinkedList<Field> openList = new LinkedList<Field>();
 	LinkedList<Field> closedList = new LinkedList<Field>();
 
-	//giebt die nï¿½chste zu gehende Position zurï¿½ck
+	//giebt die nächste zu gehende Position zurück
 	public Position getnextPosition(AiMapInfo map, Position startposition, Position targetposition) {
 		Field playerposition = new Field( startposition.x, startposition.y, null , 0, calcH(startposition,targetposition));
 
@@ -39,7 +39,7 @@ public class AStar {
 		return fieldtoPosition(closedList.get(1));
 	}
 
-	//findet kleinste f in openlist und fï¿½gt es in die colosedlist
+	//findet kleinste f in openlist und fügt es in die colosedlist
 	private void findLowF() {
 		Field temp = openList.get(0);
 		int pos = 0;
@@ -54,7 +54,7 @@ public class AStar {
 		openList.remove(pos);
 	}
 
-	//ï¿½berprï¿½ft, ob die felder begehbar sind
+	//Überprüft, ob die felder begehbar sind
 	private void movableToOpen(Position actualposition,Position targetposition, Field start, AiMapInfo map) {
 		//Lindkedlist of up, down, left, right Positions
 		LinkedList<Position> movable = new LinkedList<Position>();
@@ -84,7 +84,7 @@ public class AStar {
 		return field;
 	}
 
-	//fï¿½gt begehbare felder in die openlist ein
+	//fügt begehbare felder in die openlist ein
 	private void addPositionToOpenList(Position targetposition, Position prev, Position movable) {
 		openList.add(new Field(movable.x, movable.y, closedList.get(findPointInClosedList(prev)),closedList.get(findPointInClosedList(prev)).getG(),calcH(movable, targetposition) ));
 	}
@@ -107,7 +107,7 @@ public class AStar {
 		return -1;
 	}
 
-	//ï¿½berprï¿½ft ob feld bereits in closedlist ist
+	//Überprüft ob feld bereits in closedlist ist
 	private boolean isinclosedList(Position position) {
 		for (int i = 0; i < closedList.size(); i++) {
 			if (position.x == closedList.get(i).getX() && position.y == closedList.get(i).getY()) {
@@ -117,7 +117,7 @@ public class AStar {
 		return false;
 	}
 
-	//ï¿½berprï¿½ft ob feld bereits in opnelist ist
+	//Überprüft ob feld bereits in opnelist ist
 	private boolean isinopenList(Position position) {
 		for (int i = 0; i < openList.size(); i++) {
 			if (position == new Position(openList.get(i).getX(), openList.get(i).getY())) {
