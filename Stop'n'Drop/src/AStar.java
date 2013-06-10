@@ -1,14 +1,12 @@
 
-import java.io.ObjectInputStream.GetField;
 import java.util.LinkedList;
-
-import client.gui.elements.AiSelector;
-
 
 import core.Position;
 import core.ai.AiMapInfo;
-import core.ai.AiPlayerInfo;
 import core.map.FieldType;
+import core.map.SNDMapDebugDrawInfo;
+import core.map.SNDMapGeneratorBuilder;
+
 
 public class AStar {
 
@@ -19,7 +17,7 @@ public class AStar {
 	LinkedList<Field> openList = new LinkedList<Field>();
 	LinkedList<Field> closedList = new LinkedList<Field>();
 
-	//giebt die nächste zu gehende Position zurück
+	//giebt die nï¿½chste zu gehende Position zurï¿½ck
 	public Position getnextPosition(AiMapInfo map, Position startposition, Position targetposition) {
 		Field playerposition = new Field( startposition.x, startposition.y, null , 0, calcH(startposition,targetposition));
 
@@ -38,14 +36,10 @@ public class AStar {
 	}
 
 	private Position trakeBacktoPosition() {
-		Position erg = null;
-		for (int i = closedList.size(); i > 1; i--) {
-			erg = fieldtoPosition(closedList.get(i).getPrev());
-		}
-		return erg;
+		return fieldtoPosition(closedList.get(1));
 	}
 
-	//findet kleinste f in openlist und fügt es in die colosedlist
+	//findet kleinste f in openlist und fï¿½gt es in die colosedlist
 	private void findLowF() {
 		Field temp = openList.get(0);
 		int pos = 0;
@@ -54,13 +48,13 @@ public class AStar {
 			if (openList.get(i).getF() < temp.getF()) {
 				temp = openList.get(i);
 				pos = i;
-			}	
+			}
 		}
 		closedList.add(temp);
 		openList.remove(pos);
 	}
 
-	//überprüft, ob die felder begehbar sind
+	//ï¿½berprï¿½ft, ob die felder begehbar sind
 	private void movableToOpen(Position actualposition,Position targetposition, Field start, AiMapInfo map) {
 		//Lindkedlist of up, down, left, right Positions
 		LinkedList<Position> movable = new LinkedList<Position>();
@@ -72,10 +66,8 @@ public class AStar {
 				//check if g is lower if prev = movable i
 				if (isinopenList(movable.get(i))) {
 					changeprev(movable.get(i));
-				}else{
-					if (!isinclosedList(movable.get(i))) {				//check if is in closedlist
-						addPositionToOpenList(targetposition, actualposition, movable.get(i));
-					}
+				} else if (!isinclosedList(movable.get(i))) {				//check if is in closedlist
+					addPositionToOpenList(targetposition, actualposition, movable.get(i));
 				}
 			}
 		}
@@ -92,7 +84,7 @@ public class AStar {
 		return field;
 	}
 
-	//fügt begehbare felder in die openlist ein
+	//fï¿½gt begehbare felder in die openlist ein
 	private void addPositionToOpenList(Position targetposition, Position prev, Position movable) {
 		openList.add(new Field(movable.x, movable.y, closedList.get(findPointInClosedList(prev)),closedList.get(findPointInClosedList(prev)).getG(),calcH(movable, targetposition) ));
 	}
@@ -115,17 +107,17 @@ public class AStar {
 		return -1;
 	}
 
-	//überprüft ob feld bereits in closedlist ist
+	//ï¿½berprï¿½ft ob feld bereits in closedlist ist
 	private boolean isinclosedList(Position position) {
 		for (int i = 0; i < closedList.size(); i++) {
 			if (position.x == closedList.get(i).getX() && position.y == closedList.get(i).getY()) {
 				return true;
 			}
-		}	
+		}
 		return false;
 	}
 
-	//überprüft ob feld bereits in opnelist ist
+	//ï¿½berprï¿½ft ob feld bereits in opnelist ist
 	private boolean isinopenList(Position position) {
 		for (int i = 0; i < openList.size(); i++) {
 			if (position == new Position(openList.get(i).getX(), openList.get(i).getY())) {
@@ -153,6 +145,25 @@ public class AStar {
 			return true;
 		}
 		return false;
+	}
+
+    // my test function
+	public static void main(String[] args) {
+		SNDMapGeneratorBuilder builder = new SNDMapGeneratorBuilder();
+		builder.setSizeX(100);
+		builder.setSizeY(100);
+		builder.setNumberOfHoles(50);
+		builder.setCreateRandomHoles(true);
+		builder.setNumberOfObstacles(20);
+
+		AiMapInfo map = new AiMapInfo(builder.buildMapGenerator().generateMap(), new SNDMapDebugDrawInfo(100, 100), "EasyGame");
+		Position next = new Position(5, 5);
+		Position end = new Position(50, 50);
+
+		while ((next = new AStar().getnextPosition(map, next, end)) != null) {
+			System.out.println(next.toString());
+		}
+
 	}
 
 }
