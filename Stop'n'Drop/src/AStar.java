@@ -20,24 +20,29 @@ public class AStar {
 	LinkedList<Field> closedList = new LinkedList<Field>();
 
 	//giebt die nächste zu gehende Position zurück
-	public Position getnextPosition(AiMapInfo map, AiPlayerInfo player, Position startposition, Position targetposition) {
-		Field start = new Field( startposition.x, startposition.y);
-		Field target = new Field(targetposition.x, targetposition.y);
+	public Position getnextPosition(AiMapInfo map, Position startposition, Position targetposition) {
+		Field playerposition = new Field( startposition.x, startposition.y, null , 0, calcH(startposition,targetposition));
 
 		//cancel if already on targetpoint
-		if(target.equals(start))return startposition;
+		if(samePosition(startposition, targetposition))return startposition;
 
-		isfirst(start);
+		openList.add(playerposition);
 
-		while (!isinclosedList(targetposition)) {
+		while (!isinclosedList(targetposition)||openList.isEmpty()) {
 			findLowF();
-			Position actualposition = new Position(closedList.getLast().x, closedList.getLast().y);
-			movabletoopen(player, actualposition, targetposition, start, map);
+			movableToOpen(new Position(closedList.getLast().getX(), closedList.getLast().getY()), targetposition, playerposition, map);
 		}
 
-		Position erg = new Position(closedList.get(1).x,closedList.get(1).y);
-		return erg;
+		return new Position(trakeBacktoPosition());
 
+	}
+
+	private Position trakeBacktoPosition() {
+		Position erg = null;
+		for (int i = closedList.size(); i > 1; i--) {
+			erg = fieldtoPosition(closedList.get(i).getPrev());
+		}
+		return erg;
 	}
 
 	//findet kleinste f in openlist und fügt es in die colosedlist
@@ -46,7 +51,7 @@ public class AStar {
 		int pos = 0;
 
 		for (int i = 1; i < openList.size(); i++) {
-			if (openList.get(i).getF()<temp.getF()) {
+			if (openList.get(i).getF() < temp.getF()) {
 				temp = openList.get(i);
 				pos = i;
 			}	
@@ -55,28 +60,30 @@ public class AStar {
 		openList.remove(pos);
 	}
 
-	//wenn openlist lehr ist, füge ein
-	private void isfirst(Field start) {
-		if (openList.isEmpty()) {
-			start.setG(0);
-			openList.add(start);
-		}
-	}
-
 	//überprüft, ob die felder begehbar sind
-	private void movabletoopen(AiPlayerInfo player, Position startposition,
-			Position targetposition, Field start, AiMapInfo map) {
+	private void movableToOpen(Position actualposition,Position targetposition, Field start, AiMapInfo map) {
 		//Lindkedlist of up, down, left, right Positions
 		LinkedList<Position> movable = new LinkedList<Position>();
-		movable.addAll(startposition.getD4Neighbors());
+		movable.addAll(actualposition.getD4Neighbors());
 
 		for (int i = 0; i < movable.size(); i++) {				//itterate thrue movable
 			if (getFieldType(movable.get(i), map)== FieldType.STABLE_FIELD||			//check if field is movable
 					getFieldType(movable.get(i), map)==FieldType.UNSTABLE_FIELD) {
-				if (!isinclosedList(movable.get(i))) {				//check if is in closedlist
-					addPositiontoopenList(player, targetposition, start, movable, i);
+				//check if g is lower if prev = movable i
+				if (isinopenList(movable.get(i))) {
+					changeprev(movable.get(i));
+				}else{
+					if (!isinclosedList(movable.get(i))) {				//check if is in closedlist
+						addPositionToOpenList(targetposition, actualposition, movable.get(i));
+					}
 				}
 			}
+		}
+	}
+
+	private void changeprev(Position position) {
+		if (openList.get(findPointInOpenList(position)).getG() < closedList.getLast().getG()+1) {
+			openList.get(findPointInOpenList(position)).setPrev(closedList.getLast());
 		}
 	}
 
@@ -86,37 +93,50 @@ public class AStar {
 	}
 
 	//fügt begehbare felder in die openlist ein
-	private void addPositiontoopenList(AiPlayerInfo player,Position targetposition, Field start, LinkedList<Position> movable,int i) {
-		openList.add(new Field(movable.get(i).x, movable.get(i).y,start,
-				calcG(),calcH(movable.get(i),targetposition)));
+	private void addPositionToOpenList(Position targetposition, Position prev, Position movable) {
+		openList.add(new Field(movable.x, movable.y, closedList.get(findPointInClosedList(prev)),closedList.get(findPointInClosedList(prev)).getG(),calcH(movable, targetposition) ));
+	}
+
+	private int findPointInClosedList(Position position) {
+		for (int i = 0; i < closedList.size(); i++) {
+			if (position.x == closedList.get(i).getX()&& position.y == closedList.get(i).getY()) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private int findPointInOpenList(Position position) {
+		for (int i = 0; i < openList.size(); i++) {
+			if (position.x == openList.get(i).getX()&& position.y == openList.get(i).getY()) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	//überprüft ob feld bereits in closedlist ist
+	private boolean isinclosedList(Position position) {
+		for (int i = 0; i < closedList.size(); i++) {
+			if (position.x == closedList.get(i).getX() && position.y == closedList.get(i).getY()) {
+				return true;
+			}
+		}	
+		return false;
 	}
 
 	//überprüft ob feld bereits in opnelist ist
 	private boolean isinopenList(Position position) {
 		for (int i = 0; i < openList.size(); i++) {
-			if (position == new Position(openList.get(i).x, openList.get(i).y)) {
+			if (position == new Position(openList.get(i).getX(), openList.get(i).getY())) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	//überprüft ob feld bereits in closedlist ist
-	private boolean isinclosedList(Position position) {
-
-		for (int i = 0; i < closedList.size(); i++) {
-
-			if (position.x == closedList.get(i).x && position.y == closedList.get(i).y) {
-				return true;
-
-			}
-
-		}	
-		return false;
-	}
-
 	public Position fieldtoPosition(Field field) {
-		Position erg = new Position(field.x, field.y);
+		Position erg = new Position(field.getX(), field.getY());
 		return erg;
 	}
 
@@ -127,9 +147,12 @@ public class AStar {
 		return erg;
 	}
 
-	public int calcG() {
-		int closemin = closedList.size()-1;
-		return closedList.get(closemin).G +1;
+
+	public boolean samePosition(Position positiona, Position positionb) {
+		if (positiona.x == positionb.x & positiona.y == positionb.y) {
+			return true;
+		}
+		return false;
 	}
 
 }

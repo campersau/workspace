@@ -4,20 +4,18 @@ import core.Position;
 
 public class Field {
 	
-	int x,y;
+	private int x,y;
 	/*
 	 * G = Die Bewegungskosten, um vom Startpunkt A zu einem gegebenen Quadrat des Gitters unter Verwendung des dafür 
 	 * ermittelten Pfades zu gelangen.
 	 * 
 	 * H = Die geschätzten Kosten, um von dem gegebenen Quadrat zum Zielpunkt B zu gelangen.
 	 */
-	int G,H;
-	//F = Gesamtkosten für den gefundenen Weg
-	int F ;
+	private int G,H;
 	//bewegungskosten um über ein Feld zu laufen
-	int movment;
+	private int movment;
 	//Vorgänger des Feldes
-	Field prev = null;
+	private Field prev = null;
 	
 	public Field(int x, int y) {
 		this.x = x;
@@ -32,6 +30,7 @@ public class Field {
 		this.H = h;
 	}
 
+
 	public Position fieldtoPosition(Field field) {
 		Position erg = new Position(field.x, field.y);
 		return erg;
@@ -42,46 +41,44 @@ public class Field {
 	}
 	
 	public int getF() {
-		F = G + H;
-		return this.F;
-	}
-	
-	public void setF(int f) {
-		this.F = f;
+		return getG()+ getH();
 	}
 	
 	public int getX() {
-		return x;
+		return this.x;
 	}
 	public void setX(int x) {
 		this.x = x;
 	}
 	public int getY() {
-		return y;
+		return this.y;
 	}
 	public void setY(int y) {
 		this.y = y;
 	}
 	public int getG() {
-		return G;
+		if (this.prev == null) {
+			return 1;
+		}
+		return this.prev.G +1;
 	}
 	public void setG(int g) {
 		G = g;
 	}
 	public int getH() {
-		return H;
+		return this.H;
 	}
 	public void setH(int h) {
 		H = h;
 	}
 	public int getMovment() {
-		return movment;
+		return this.movment;
 	}
 	public void setMovment(int movment) {
 		this.movment = movment;
 	}
 	public Field getPrev() {
-		return prev;
+		return this.prev;
 	}
 	public void setPrev(Field prev) {
 		this.prev = prev;

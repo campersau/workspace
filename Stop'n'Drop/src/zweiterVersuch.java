@@ -27,7 +27,7 @@ public class zweiterVersuch extends PlayerController{
 
 			AStar sternchen = new AStar();
 
-			Position next = sternchen.getnextPosition(map, ownPlayer, ownPlayer.getPosition(), getFlag(map));;
+			Position next = sternchen.getnextPosition(map, ownPlayer.getPosition(), getFlag(map));;
 
 			if (next == (ownPlayer.getPosition().right())) return Action.MOVE_RIGHT;
 			if (next == (ownPlayer.getPosition().left())) return Action.MOVE_LEFT;
