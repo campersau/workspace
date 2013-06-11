@@ -1,169 +1,132 @@
-
+import java.security.acl.Owner;
 import java.util.LinkedList;
 
 import core.Position;
 import core.ai.AiMapInfo;
-import core.map.FieldType;
-import core.map.SNDMapDebugDrawInfo;
-import core.map.SNDMapGeneratorBuilder;
+import core.ai.AiPlayerInfo;
 
 
 public class AStar {
 
-	public AStar(){
-
-	}
-
 	LinkedList<Field> openList = new LinkedList<Field>();
 	LinkedList<Field> closedList = new LinkedList<Field>();
 
-	//giebt die nächste zu gehende Position zurück
-	public Position getnextPosition(AiMapInfo map, Position startposition, Position targetposition) {
-		Field playerposition = new Field( startposition.x, startposition.y, null , 0, calcH(startposition,targetposition));
+	AiMapInfo map;
+	AiPlayerInfo playerinf;
+	Position target;
 
-		//cancel if already on targetpoint
-		if(samePosition(startposition, targetposition))return startposition;
+	public AStar (AiMapInfo map, AiPlayerInfo playerinf, Position target) {
+		this.map = map;
+		this.playerinf = playerinf;
+		this.target = target;
+	}
 
-		openList.add(playerposition);
+	public Position getNextPosition() {
 
-		while (!isinclosedList(targetposition)||openList.isEmpty()) {
-			findLowF();
-			movableToOpen(new Position(closedList.getLast().getX(), closedList.getLast().getY()), targetposition, playerposition, map);
+		Field start = new Field(playerinf.getPosition(), target, map.getField(playerinf.getPosition()));
+		openList.add(start);
+
+		while (!openList.isEmpty()&& !isInClosedList(target)) {
+			Field lowF = findLowestF();
+			int indexOfLowest = findLowestFIndex();
+			openList.remove(indexOfLowest);
+			if(!isInClosedList(lowF)) {closedList.add(lowF);}
+			addSurrounding(lowF);
+			
 		}
-
-		return new Position(trakeBacktoPosition());
-
+		Field erg = trackBackToPosition();
+		return erg.fieldtoPosition();
 	}
 
-	private Position trakeBacktoPosition() {
-		return fieldtoPosition(closedList.get(1));
+	private Field trackBackToPosition() {
+		Field last = closedList.getLast();
+		while (last.getPrev().getPrev() != null){
+			last = last.getPrev();
+		}
+		return last;
 	}
 
-	//findet kleinste f in openlist und fügt es in die colosedlist
-	private void findLowF() {
-		Field temp = openList.get(0);
-		int pos = 0;
+	private void addSurrounding(Field lowF) {
+	
+		Position current = new Position(lowF.getX(), lowF.getY());
+		
+		Position leftOf = new Position(current.x-1, current.y);
+		Field leftOfField = new Field(leftOf, target, playerinf.getPosition(), map.getField(leftOf), lowF);
+		if(leftOfField.iswalkable() && !isInClosedList(leftOfField) && !isInOpenList(lowF)) openList.add(leftOfField);
+	
+		Position rightOf = new Position(current.x+1, current.y);
+		Field rightOfField = new Field(rightOf, target, playerinf.getPosition(), map.getField(rightOf), lowF);
+		if(rightOfField.iswalkable() && !isInClosedList(rightOfField) && !isInOpenList(lowF)) openList.add(rightOfField);
+	
+		Position aboveOf = new Position(current.x, current.y-1);
+		Field aboveOfField = new Field(aboveOf, target, playerinf.getPosition(), map.getField(aboveOf), lowF);
+		if(aboveOfField.iswalkable() && !isInClosedList(aboveOfField) && !isInOpenList(lowF)) openList.add(aboveOfField);
+	
+		Position belowOf = new Position(current.x, current.y+1);
+		Field belowOfField = new Field(belowOf, target, playerinf.getPosition(), map.getField(belowOf), lowF);
+		if(belowOfField.iswalkable() && !isInClosedList(belowOfField) && !isInOpenList(lowF)) openList.add(belowOfField);
+	}
+	private boolean isInOpenList(Field current) {
+		for (int i = 0; i < openList.size(); i++) {
+			if (sameField(current, openList.get(i))) {
+				 return true;
+			}
+		}
+		return false;
+	}
 
+	private Field findLowestF() {
+		Field temp = openList.getFirst();
 		for (int i = 1; i < openList.size(); i++) {
-			if (openList.get(i).getF() < temp.getF()) {
+			if (temp.getF() > openList.get(i).getF()) {
 				temp = openList.get(i);
-				pos = i;
 			}
 		}
-		closedList.add(temp);
-		openList.remove(pos);
+		return temp;
 	}
-
-	//Überprüft, ob die felder begehbar sind
-	private void movableToOpen(Position actualposition,Position targetposition, Field start, AiMapInfo map) {
-		//Lindkedlist of up, down, left, right Positions
-		LinkedList<Position> movable = new LinkedList<Position>();
-		movable.addAll(actualposition.getD4Neighbors());
-
-		for (int i = 0; i < movable.size(); i++) {				//itterate thrue movable
-			if (getFieldType(movable.get(i), map)== FieldType.STABLE_FIELD||			//check if field is movable
-					getFieldType(movable.get(i), map)==FieldType.UNSTABLE_FIELD) {
-				//check if g is lower if prev = movable i
-				if (isinopenList(movable.get(i))) {
-					changeprev(movable.get(i));
-				} else if (!isinclosedList(movable.get(i))) {				//check if is in closedlist
-					addPositionToOpenList(targetposition, actualposition, movable.get(i));
-				}
+	
+	private int findLowestFIndex() {
+		Field temp = openList.getFirst();
+		int index = 0;
+		for (int i = 1; i < openList.size(); i++) {
+			if (temp.getF() > openList.get(i).getF()) {
+				temp = openList.get(i);
+				index = i;
 			}
 		}
+		return index;
 	}
 
-	private void changeprev(Position position) {
-		if (openList.get(findPointInOpenList(position)).getG() < closedList.getLast().getG()+1) {
-			openList.get(findPointInOpenList(position)).setPrev(closedList.getLast());
-		}
-	}
-
-	private FieldType getFieldType(Position position, AiMapInfo map) {
-		FieldType field = map.getField(position);
-		return field;
-	}
-
-	//fügt begehbare felder in die openlist ein
-	private void addPositionToOpenList(Position targetposition, Position prev, Position movable) {
-		openList.add(new Field(movable.x, movable.y, closedList.get(findPointInClosedList(prev)),closedList.get(findPointInClosedList(prev)).getG(),calcH(movable, targetposition) ));
-	}
-
-	private int findPointInClosedList(Position position) {
-		for (int i = 0; i < closedList.size(); i++) {
-			if (position.x == closedList.get(i).getX()&& position.y == closedList.get(i).getY()) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private int findPointInOpenList(Position position) {
-		for (int i = 0; i < openList.size(); i++) {
-			if (position.x == openList.get(i).getX()&& position.y == openList.get(i).getY()) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	//Überprüft ob feld bereits in closedlist ist
-	private boolean isinclosedList(Position position) {
-		for (int i = 0; i < closedList.size(); i++) {
-			if (position.x == closedList.get(i).getX() && position.y == closedList.get(i).getY()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	//Überprüft ob feld bereits in opnelist ist
-	private boolean isinopenList(Position position) {
-		for (int i = 0; i < openList.size(); i++) {
-			if (position == new Position(openList.get(i).getX(), openList.get(i).getY())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public Position fieldtoPosition(Field field) {
-		Position erg = new Position(field.getX(), field.getY());
-		return erg;
-	}
-
-	public int calcH(Position actual, Position target) {
-		int x = Math.abs(actual.x - target.x);
-		int y = Math.abs(actual.y - target.y);
-		int erg = x+y;
-		return erg;
-	}
-
-
-	public static boolean samePosition(Position positiona, Position positionb) {
-		if (positiona.x == positionb.x & positiona.y == positionb.y) {
+	private boolean sameField(Field a,Position b) {
+		if (a.getX() == b.x && a.getY()== b.y) {
 			return true;
 		}
 		return false;
 	}
 
-    // my test function
-	public static void main(String[] args) {
-		SNDMapGeneratorBuilder builder = new SNDMapGeneratorBuilder();
-		builder.setSizeX(100);
-		builder.setSizeY(100);
-		builder.setNumberOfHoles(50);
-		builder.setCreateRandomHoles(true);
-		builder.setNumberOfObstacles(20);
-
-		AiMapInfo map = new AiMapInfo(builder.buildMapGenerator().generateMap(), new SNDMapDebugDrawInfo(100, 100), "EasyGame");
-		Position next = new Position(5, 5);
-		Position end = new Position(50, 50);
-
-		while (!samePosition((next = new AStar().getnextPosition(map, next, end)), end)) {
-			System.out.println(next.toString());
+	private boolean sameField(Field lowF, Field field) {
+		if (lowF.getX() == field.getX()&& lowF.getY()== field.getY()) {
+			return true;
 		}
+		return false;
+	}
 
+	private boolean isInClosedList(Position target) {
+		for (int i = 0; i < closedList.size(); i++) {
+			if (sameField(closedList.get(i), target)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isInClosedList(Field lowF) {
+		for (int i = 0; i < closedList.size(); i++) {
+			if (sameField(lowF, closedList.get(i))) {
+				 return true;
+			}
+		}
+		return false;
 	}
 
 }
