@@ -1,4 +1,3 @@
-import java.security.acl.Owner;
 import java.util.LinkedList;
 
 import core.Position;
@@ -28,11 +27,10 @@ public class AStar {
 
 		while (!openList.isEmpty()&& !isInClosedList(target)) {
 			Field lowF = findLowestF();
-			int indexOfLowest = findLowestFIndex();
-			openList.remove(indexOfLowest);
+			openList.remove(lowF);
 			if(!isInClosedList(lowF)) {closedList.add(lowF);}
 			addSurrounding(lowF);
-			
+
 		}
 		Field erg = trackBackToPosition();
 		return erg.fieldtoPosition();
@@ -47,21 +45,21 @@ public class AStar {
 	}
 
 	private void addSurrounding(Field lowF) {
-	
+
 		Position current = new Position(lowF.getX(), lowF.getY());
-		
+
 		Position leftOf = new Position(current.x-1, current.y);
 		Field leftOfField = new Field(leftOf, target, playerinf.getPosition(), map.getField(leftOf), lowF);
 		if(leftOfField.iswalkable() && !isInClosedList(leftOfField) && !isInOpenList(lowF)) openList.add(leftOfField);
-	
+
 		Position rightOf = new Position(current.x+1, current.y);
 		Field rightOfField = new Field(rightOf, target, playerinf.getPosition(), map.getField(rightOf), lowF);
 		if(rightOfField.iswalkable() && !isInClosedList(rightOfField) && !isInOpenList(lowF)) openList.add(rightOfField);
-	
+
 		Position aboveOf = new Position(current.x, current.y-1);
 		Field aboveOfField = new Field(aboveOf, target, playerinf.getPosition(), map.getField(aboveOf), lowF);
 		if(aboveOfField.iswalkable() && !isInClosedList(aboveOfField) && !isInOpenList(lowF)) openList.add(aboveOfField);
-	
+
 		Position belowOf = new Position(current.x, current.y+1);
 		Field belowOfField = new Field(belowOf, target, playerinf.getPosition(), map.getField(belowOf), lowF);
 		if(belowOfField.iswalkable() && !isInClosedList(belowOfField) && !isInOpenList(lowF)) openList.add(belowOfField);
@@ -83,18 +81,6 @@ public class AStar {
 			}
 		}
 		return temp;
-	}
-	
-	private int findLowestFIndex() {
-		Field temp = openList.getFirst();
-		int index = 0;
-		for (int i = 1; i < openList.size(); i++) {
-			if (temp.getF() > openList.get(i).getF()) {
-				temp = openList.get(i);
-				index = i;
-			}
-		}
-		return index;
 	}
 
 	private boolean sameField(Field a,Position b) {
